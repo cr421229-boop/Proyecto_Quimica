@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUÍMICA PRO - Analizador de Proporciones</title>
+<style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Degradado basado en tonos aguamarina/oceánicos */
+            background: linear-gradient(135deg, #5bc9a4, #45b7af, #2c5364);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white; /* Se mantiene blanco */
+            color: #333;
+            border-radius: 20px;
+            padding: 0; /* Ajustado para que las pestañas toquen el borde */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        
+        /* --- Nuevos Estilos para Navegación y Teoría --- */
+        .tabs {
+            display: flex;
+            background: #48aea7;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .tab-button.inactive {
+            background: #48aea7;
+            color: white;
+        }
+        .tab-button.active {
+            background: white;
+            color: #48aea7;
+            border-radius: 15px 15px 0 0;
+            margin-top: 5px;
+        }
+        .content-padding { padding: 30px; }
+        .info-card {
+            background: #fdf2ff;
+            border-left: 5px solid #48aea7;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .info-card h2 { color: #48aea7; margin-top: 0; font-size: 1.2em; }
+        .example-box {
+            background: #2d2d2d;
+            color: #48aea7;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+        .hidden { display: none; }
+        /* ----------------------------------------------- */
+
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #7fffd4; /* Borde aguamarina */
+            font-size: 18px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #20b2aa; /* Aguamarina oscuro (Sustituye al gris) */
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #45b7af; }
+        .equation-display {
+            font-size: 1.4em;
+            background: #f1f8e9; /* Se mantiene verde claro */
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: #2e7d32; /* Se mantiene verde */
+            margin: 15px 0;
+            border: 1px solid #c8e6c9;
+        }
+        .analysis-card {
+            background: #ffebee; /* Fondo rojizo muy suave */
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 8px solid #ff0000; /* Rojo (Sustituye al naranja) */
+        }
+        .compound-card {
+            background: #f8f9fa; /* Se mantiene blanco/gris muy tenue */
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 5px solid #20b2aa; /* Aguamarina (Sustituye al gris oscuro) */
+            border-radius: 5px;
+        }
+        .error { color: #d32f2f; font-weight: bold; }
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .el-box {
+            background: #20b2aa; /* Aguamarina (Sustituye al gris) */
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs">
+        <button id="btnTeoria" class="tab-button active" onclick="showTab('teoria')">Inicio: Teoría</button>
+        <button id="btnCalc" class="tab-button inactive" onclick="showTab('calc')">Calculadora de Balanceo</button>
+    </div>
+
+    <div id="sectionTeoria" class="content-padding">
+        <h1 style="text-align: left; color: #48aea7;">Aprende Estequiometría</h1>
+        
+        <div class="info-card">
+            <h2>¿Qué es la estequiometría?</h2>
+            <p>Es la parte de la química que sirve para saber las cantidades de lo que se usa y lo que se obtiene en una reacción. Ayuda a entender cuánto necesito de una sustancia y cuánto se forma al final, evitando errores en los cálculos.</p>
+        </div>
+
+        <div class="info-card">
+            <h2>¿Por qué es importante el balanceo?</h2>
+            <p>Asegura que la ecuación esté bien, es decir, que tenga la misma cantidad de átomos a ambos lados. Sin balanceo, la reacción no tiene sentido matemático ni químico.</p>
+        </div>
+
+        <div class="info-card">
+            <h2>Ley de conservación de la materia</h2>
+            <p>La materia no desaparece ni aparece de la nada, solo se transforma. Los átomos se organizan de otra forma, pero la cantidad inicial debe ser igual a la final.</p>
+        </div>
+
+        <h3 style="color: #48aea7;">Ejemplo: Formación del Agua</h3>
+        <p>Sin balancear (Incorrecto):</p>
+        <div class="example-box">H2 + O2 → H2O</div>
+    </div>
+
+    <div id="sectionCalc" class="content-padding hidden">
+        <h1>🧪 Analizador Estequiométrico</h1>
+        
+        <input id="eqInput" placeholder="Ej: H2 + O2 -> H2O" value="Fe2(SO4)3 + KOH -> K2SO4 + Fe(OH)3">
+        <button onclick="main()">Analizar Reacción</button>
+
+        <div id="output"></div>
+        
+        <h3>📊 Masas Atómicas</h3>
+        <div id="periodicTable" class="table-grid"></div>
+    </div>
+</div>
+
+<script>
+// Función para el cambio de pestañas
+function showTab(tab) {
+    const sectionTeoria = document.getElementById('sectionTeoria');
+    const sectionCalc = document.getElementById('sectionCalc');
+    const btnTeoria = document.getElementById('btnTeoria');
+    const btnCalc = document.getElementById('btnCalc');
+
+    if (tab === 'teoria') {
+        sectionTeoria.classList.remove('hidden');
+        sectionCalc.classList.add('hidden');
+        btnTeoria.className = 'tab-button active';
+        btnCalc.className = 'tab-button inactive';
+    } else {
+        sectionTeoria.classList.add('hidden');
+        sectionCalc.classList.remove('hidden');
+        btnTeoria.className = 'tab-button inactive';
+        btnCalc.className = 'tab-button active';
+    }
+}
+
+// --- TU CÓDIGO ORIGINAL DESDE AQUÍ (SIN CAMBIOS) ---
+const ATOMIC_MASSES = {
+    H:1.008, He:4.002, Li:6.941, Be:9.012, B:10.81, C:12.01, N:14.01, O:16.00, F:18.99, Ne:20.18,
+    Na:22.99, Mg:24.31, Al:26.98, Si:28.09, P:30.97, S:32.06, Cl:35.45, Ar:39.95, K:39.10, Ca:40.08,
+    Sc:44.96, Ti:47.87, V:50.94, Cr:52.00, Mn:54.94, Fe:55.85, Co:58.93, Ni:58.69, Cu:63.55, Zn:65.38,
+    Ga:69.72, Ge:72.64, As:74.92, Se:78.96, Br:79.90, Kr:83.80
+};
+
+class Frac {
+    constructor(n, d = 1) {
+        let common = this.gcd(Math.abs(n), Math.abs(d));
+        this.n = (d < 0 ? -n : n) / common;
+        this.d = Math.abs(d) / common;
+    }
+    gcd(a, b) { return b === 0 ? a : this.gcd(b, a % b); }
+    add(f) { return new Frac(this.n * f.d + f.n * this.d, this.d * f.d); }
+    sub(f) { return new Frac(this.n * f.d - f.n * this.d, this.d * f.d); }
+    mul(f) { return new Frac(this.n * f.n, this.d * f.d); }
+    div(f) { return new Frac(this.n * f.d, this.d * f.n); }
+    isZero() { return this.n === 0; }
+}
+
+function parseFormula(formula) {
+    let stack = [{}];
+    let i = 0;
+    while (i < formula.length) {
+        if (formula[i] === '(') { stack.push({}); i++; }
+        else if (formula[i] === ')') {
+            i++;
+            let numStr = "";
+            while (i < formula.length && /\d/.test(formula[i])) numStr += formula[i++];
+            let multiplier = parseInt(numStr || 1);
+            let group = stack.pop();
+            let top = stack[stack.length - 1];
+            for (let el in group) top[el] = (top[el] || 0) + group[el] * multiplier;
+        } else if (/[A-Z]/.test(formula[i])) {
+            let el = formula[i++];
+            if (i < formula.length && /[a-z]/.test(formula[i])) el += formula[i++];
+            let numStr = "";
+            while (i < formula.length && /\d/.test(formula[i])) numStr += formula[i++];
+            let count = parseInt(numStr || 1);
+            let top = stack[stack.length - 1];
+            top[el] = (top[el] || 0) + count;
+        } else { i++; }
+    }
+    return stack[0];
+}
+
+function getMolarMass(formula) {
+    let data = parseFormula(formula);
+    let total = 0;
+    for (let el in data) total += (ATOMIC_MASSES[el] || 0) * data[el];
+    return total;
+}
+
+function balanceChemicalEquation(eqStr) {
+    let sides = eqStr.replace(/\s+/g, '').split('->');
+    if (sides.length !== 2) throw new Error("Usa '->' para separar reactivos y productos");
+    let lhs = sides[0].split('+'), rhs = sides[1].split('+');
+    let compounds = [...lhs, ...rhs];
+    let elements = new Set();
+    compounds.forEach(c => Object.keys(parseFormula(c)).forEach(e => elements.add(e)));
+    let elementList = Array.from(elements);
+    let matrix = elementList.map(el => compounds.map((comp, j) => new Frac(j < lhs.length ? (parseFormula(comp)[el] || 0) : -(parseFormula(comp)[el] || 0))));
+    let rows = matrix.length, cols = matrix[0].length, pivot = 0;
+    for (let j = 0; j < cols && pivot < rows; j++) {
+        let sel = pivot;
+        while (sel < rows && matrix[sel][j].isZero()) sel++;
+        if (sel === rows) continue;
+        [matrix[pivot], matrix[sel]] = [matrix[sel], matrix[pivot]];
+        let div = matrix[pivot][j];
+        matrix[pivot] = matrix[pivot].map(x => x.div(div));
+        for (let i = 0; i < rows; i++) if (i !== pivot) {
+            let mult = matrix[i][j];
+            matrix[i] = matrix[i].map((x, k) => x.sub(mult.mul(matrix[pivot][k])));
+        }
+        pivot++;
+    }
+    let coeffs = new Array(cols).fill(null).map(() => new Frac(0));
+    coeffs[cols - 1] = new Frac(1);
+    for (let i = 0; i < pivot; i++) {
+        let pCol = matrix[i].findIndex(x => !x.isZero());
+        if (pCol !== -1 && pCol < cols - 1) coeffs[pCol] = new Frac(-matrix[i][cols - 1].n, matrix[i][cols - 1].d);
+    }
+    let lcm = coeffs.reduce((a, b) => (a * b.d) / (function gcd(x,y){return y?gcd(y,x%y):x})(a, b.d), 1);
+    let finalCoeffs = coeffs.map(c => Math.abs(c.n * (lcm / c.d)));
+    let commonDiv = finalCoeffs.reduce((a, b) => (function gcd(x,y){return y?gcd(y,x%y):x})(a, b));
+    return { finalCoeffs: finalCoeffs.map(c => c / commonDiv), lhs, rhs, compounds };
+}
+
+function main() {
+    const out = document.getElementById("output");
+    try {
+        const result = balanceChemicalEquation(document.getElementById("eqInput").value);
+        const { finalCoeffs, lhs, rhs, compounds } = result;
+
+        let resHTML = `<div class="equation-display"><b>Ecuación Balanceada:</b><br>`;
+        resHTML += lhs.map((c, i) => (finalCoeffs[i]>1?`<b>${finalCoeffs[i]}</b>`:"")+c).join(" + ") + " → " + 
+                   rhs.map((c, i) => (finalCoeffs[i+lhs.length]>1?`<b>${finalCoeffs[i+lhs.length]}</b>`:"")+c).join(" + ") + `</div>`;
+
+        let reactData = lhs.map((comp, i) => ({
+            name: comp,
+            molarMass: getMolarMass(comp),
+            stoichMass: getMolarMass(comp) * finalCoeffs[i]
+        }));
+
+        resHTML += `<div class="analysis-card"><h3>🔍 Análisis de Proporción Crítica</h3>`;
+        if (reactData.length > 1) {
+            let sorted = [...reactData].sort((a, b) => b.stoichMass - a.stoichMass);
+            let principal = sorted[0];
+            let secundario = sorted[1];
+            let ratio = (secundario.stoichMass / principal.stoichMass).toFixed(3);
+
+            resHTML += `<p>Si mezclas cantidades iguales (1g de cada uno):<br>
+                        ⚠️ El reactivo limitante será <b>${principal.name}</b>.</p>
+                        <p>💡 <b>Proporción ideal:</b> Por cada 1g de <b>${principal.name}</b>, necesitas exactamente <b>${ratio}g</b> de <b>${secundario.name}</b> para una reacción perfecta.</p>`;
+        } else {
+            resHTML += `<p>Solo hay un reactivo, es una reacción de descomposición.</p>`;
+        }
+        resHTML += `</div>`;
+
+        resHTML += `<h3>⚖️ Detalle de Masas:</h3>`;
+        compounds.forEach((comp, idx) => {
+            let m = getMolarMass(comp);
+            resHTML += `<div class="compound-card"><b>${comp}</b><br>Masa Molar: ${m.toFixed(3)} g/mol<br>Masa en Reacción: ${(m * finalCoeffs[idx]).toFixed(3)} g</div>`;
+        });
+
+        out.innerHTML = resHTML;
+    } catch (e) { out.innerHTML = `<p class="error">❌ ${e.message}</p>`; }
+}
+
+let tableHtml = "";
+for (let e in ATOMIC_MASSES) tableHtml += `<div class="el-box"><b>${e}</b><br>${ATOMIC_MASSES[e]}</div>`;
+document.getElementById("periodicTable").innerHTML = tableHtml;
+</script>
+</body>
+</html>
